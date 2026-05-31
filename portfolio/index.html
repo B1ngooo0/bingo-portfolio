@@ -1,0 +1,1286 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>邓斌 — 美术项目管理 APM</title>
+<meta name="description" content="邓斌的个人网站。给混沌建秩序——游戏美术项目管理。">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700;900&family=Caveat:wght@400;600&family=Inter:wght@300;400;600;800;900&display=swap" rel="stylesheet">
+<style>
+/* ============ RESET & BASE ============ */
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; font-size: 16px; overflow-x: hidden; }
+body {
+  font-family: 'Noto Sans SC', 'Inter', sans-serif;
+  color: #1a1a1a;
+  background: #fefcf6;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+::selection { background: #F4D758; color: #1a1a1a; }
+
+/* ============ CUSTOM CURSOR GLOW ============ */
+.cursor-glow {
+  position: fixed;
+  width: 320px; height: 320px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(244,215,88,0.12) 0%, transparent 70%);
+  pointer-events: none;
+  z-index: 9999;
+  transform: translate(-50%, -50%);
+  transition: opacity 0.3s;
+  opacity: 0;
+}
+body:hover .cursor-glow { opacity: 1; }
+
+/* ============ SECTION COMMON ============ */
+section { position: relative; }
+.section-label {
+  font-family: 'Inter', sans-serif;
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: #999;
+  margin-bottom: 3rem;
+}
+
+/* ============ HERO — TERMINAL STYLE ============ */
+.hero {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  background: #0d1117;
+  position: relative;
+  overflow: hidden;
+  padding: 2rem;
+}
+.terminal-window {
+  width: 100%;
+  max-width: 720px;
+  background: #161b22;
+  border-radius: 12px;
+  box-shadow: 0 20px 80px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.06);
+  overflow: hidden;
+  position: relative;
+  z-index: 2;
+}
+.terminal-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 14px 18px;
+  background: #1c2129;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+.terminal-dot {
+  width: 12px; height: 12px;
+  border-radius: 50%;
+}
+.terminal-dot--red { background: #ff5f57; }
+.terminal-dot--yellow { background: #febc2e; }
+.terminal-dot--green { background: #28c840; }
+.terminal-header-title {
+  flex: 1;
+  text-align: center;
+  font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace;
+  font-size: 0.75rem;
+  color: rgba(255,255,255,0.35);
+  margin-right: 52px;
+}
+.terminal-body {
+  padding: 1.8rem 2rem 2.5rem;
+  font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace;
+  font-size: clamp(0.85rem, 1.8vw, 1rem);
+  line-height: 1.8;
+  min-height: 360px;
+}
+.terminal-line {
+  opacity: 0;
+  white-space: pre-wrap;
+  word-break: break-all;
+}
+.terminal-line.visible {
+  opacity: 1;
+}
+.terminal-line .cmd {
+  color: #2B7FD8;
+}
+.terminal-line .cmd-text {
+  color: #8b949e;
+}
+.terminal-line .output {
+  color: #F4D758;
+}
+.terminal-line .highlight {
+  color: #28c840;
+}
+.terminal-line .link {
+  color: #F7A946;
+  text-decoration: underline;
+  text-decoration-style: dotted;
+  text-underline-offset: 3px;
+  cursor: default;
+}
+
+.terminal-cursor {
+  display: inline-block;
+  width: 0.6em;
+  height: 1.15em;
+  background: #F4D758;
+  vertical-align: text-bottom;
+  animation: cursorBlink 1s step-end infinite;
+}
+@keyframes cursorBlink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 0.8; transform: translateY(0); }
+}
+
+.hero-scroll {
+  position: absolute;
+  bottom: 3rem;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  opacity: 0;
+  animation: fadeUp 0.6s 8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+.hero-scroll span {
+  font-size: 0.65rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.4);
+}
+.hero-scroll-line {
+  width: 1px; height: 40px;
+  background: #F4D758;
+  opacity: 0.4;
+  animation: scrollPulse 2s ease-in-out infinite;
+}
+@keyframes scrollPulse {
+  0%, 100% { transform: scaleY(1); opacity: 0.3; }
+  50% { transform: scaleY(1.5); opacity: 0.6; }
+}
+
+/* ============ PHILOSOPHY — FULLSCREEN SLIDE ============ */
+.philosophy-section {
+  position: relative;
+}
+.philosophy-slide {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  padding: 4rem 2rem;
+  position: relative;
+  overflow: hidden;
+}
+.philosophy-slide:nth-child(1) { background: #F4D758; }
+.philosophy-slide:nth-child(2) { background: #2B7FD8; color: #fff; }
+.philosophy-slide:nth-child(3) { background: #fefcf6; }
+
+.philosophy-number {
+  font-family: 'Inter', sans-serif;
+  font-weight: 900;
+  font-size: clamp(6rem, 20vw, 16rem);
+  opacity: 0.06;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  line-height: 1;
+  pointer-events: none;
+}
+.philosophy-slide:nth-child(2) .philosophy-number { opacity: 0.08; color: #fff; }
+
+.philosophy-text {
+  font-family: 'Noto Sans SC', sans-serif;
+  font-weight: 900;
+  font-size: clamp(1.8rem, 5.5vw, 3.8rem);
+  max-width: 800px;
+  line-height: 1.35;
+  letter-spacing: -0.02em;
+  position: relative;
+  z-index: 1;
+  opacity: 0;
+  transform: translateY(50px) scale(0.95);
+  transition: all 1s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.philosophy-text.is-visible {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+.philosophy-deco {
+  font-family: 'Caveat', cursive;
+  font-size: 1rem;
+  opacity: 0.5;
+  margin-top: 2rem;
+  position: relative;
+  z-index: 1;
+}
+
+/* ============ TIMELINE ============ */
+.timeline-section {
+  padding: 8rem 2rem;
+  background: #fefcf6;
+  position: relative;
+}
+.timeline-section-inner {
+  max-width: 900px;
+  margin: 0 auto;
+}
+.timeline-section .section-label { text-align: center; }
+.timeline-section-headline {
+  font-family: 'Noto Sans SC', sans-serif;
+  font-weight: 800;
+  font-size: clamp(2rem, 5vw, 3.5rem);
+  text-align: center;
+  margin-bottom: 5rem;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+}
+.timeline-section-headline em {
+  font-style: normal;
+  color: #2B7FD8;
+}
+.timeline {
+  position: relative;
+  padding-left: 3rem;
+}
+.timeline::before {
+  content: '';
+  position: absolute;
+  left: 6px;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: linear-gradient(to bottom, #F4D758, #2B7FD8, #F7A946);
+}
+.tl-item {
+  position: relative;
+  margin-bottom: 4rem;
+  opacity: 0;
+  transform: translateX(-20px);
+  transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+  padding-right: 180px;
+}
+.tl-num {
+  position: absolute;
+  right: 0;
+  top: 0.2rem;
+  font-family: 'Inter', sans-serif;
+  font-weight: 900;
+  font-size: 2.5rem;
+  color: #D4537E;
+  opacity: 0.25;
+  line-height: 1;
+}
+.tl-item.is-visible {
+  opacity: 1;
+  transform: translateX(0);
+}
+.tl-item::before {
+  content: '';
+  position: absolute;
+  left: -3rem;
+  top: 0.5rem;
+  width: 14px; height: 14px;
+  border-radius: 50%;
+  border: 3px solid #F4D758;
+  background: #fefcf6;
+  z-index: 1;
+  transition: all 0.3s;
+}
+.tl-item:nth-child(2)::before { border-color: #2B7FD8; }
+.tl-item:nth-child(3)::before { border-color: #F7A946; }
+.tl-item:nth-child(4)::before { border-color: #1a1a1a; }
+
+.tl-item.is-visible::before {
+  background: #F4D758;
+  box-shadow: 0 0 0 6px rgba(244,215,88,0.2);
+}
+.tl-item:nth-child(2).is-visible::before { background: #2B7FD8; box-shadow: 0 0 0 6px rgba(43,127,216,0.2); }
+.tl-item:nth-child(3).is-visible::before { background: #F7A946; box-shadow: 0 0 0 6px rgba(247,169,70,0.2); }
+.tl-item:nth-child(4).is-visible::before { background: #1a1a1a; box-shadow: 0 0 0 6px rgba(26,26,26,0.15); }
+
+.tl-year {
+  font-family: 'Inter', sans-serif;
+  font-weight: 900;
+  font-size: 0.8rem;
+  letter-spacing: 0.15em;
+  color: #999;
+  margin-bottom: 0.5rem;
+}
+.tl-title {
+  font-weight: 700;
+  font-size: 1.5rem;
+  margin-bottom: 0.4rem;
+  line-height: 1.3;
+}
+.tl-desc {
+  font-weight: 300;
+  font-size: 1rem;
+  color: #555;
+  line-height: 1.6;
+}
+.tl-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.8rem;
+}
+.tl-tag {
+  font-size: 0.75rem;
+  padding: 0.2rem 0.6rem;
+  border-radius: 100px;
+  background: rgba(244,215,88,0.2);
+  color: #1a1a1a;
+  font-weight: 500;
+}
+
+/* ============ PROJECTS — MAGAZINE CARDS ============ */
+.projects {
+  padding: 10rem 2rem;
+  background: #fefcf6;
+}
+.projects-inner {
+  max-width: 1100px;
+  margin: 0 auto;
+}
+.projects .section-label { text-align: center; }
+.projects-headline {
+  font-family: 'Noto Sans SC', sans-serif;
+  font-weight: 800;
+  font-size: clamp(2rem, 5vw, 3.5rem);
+  text-align: center;
+  margin-bottom: 5rem;
+  letter-spacing: -0.02em;
+}
+
+.project-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 2rem;
+}
+.project-card {
+  border-radius: 24px;
+  padding: 3rem;
+  min-height: 420px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  position: relative;
+  overflow: hidden;
+  cursor: default;
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.4s;
+  transform-style: preserve-3d;
+  will-change: transform;
+}
+.project-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 24px;
+  opacity: 0;
+  transition: opacity 0.4s;
+}
+.project-card:hover {
+  box-shadow: 0 30px 80px rgba(0,0,0,0.12);
+}
+.project-card--1 {
+  background: linear-gradient(135deg, #F4D758 0%, #F7A946 100%);
+}
+.project-card--1::before {
+  background: linear-gradient(135deg, #f0cc20 0%, #e89520 100%);
+}
+.project-card--2 {
+  background: linear-gradient(135deg, #2B7FD8 0%, #1a5fa0 100%);
+  color: #fff;
+}
+.project-card--2::before {
+  background: linear-gradient(135deg, #2070c8 0%, #144a80 100%);
+}
+.project-card--3 {
+  background: linear-gradient(135deg, #D4537E 0%, #993556 100%);
+  color: #fff;
+}
+.project-card--3::before {
+  background: linear-gradient(135deg, #c0406d 0%, #7a2644 100%);
+}
+.project-card:hover::before { opacity: 1; }
+
+.project-card-bg-text {
+  font-family: 'Inter', sans-serif;
+  font-weight: 900;
+  font-size: clamp(4rem, 10vw, 8rem);
+  position: absolute;
+  top: 1.5rem;
+  right: 1.5rem;
+  opacity: 0.1;
+  line-height: 1;
+  pointer-events: none;
+}
+.project-card--2 .project-card-bg-text { opacity: 0.12; }
+.project-card--3 .project-card-bg-text { opacity: 0.12; }
+
+.project-card-content {
+  position: relative;
+  z-index: 1;
+}
+.project-card-emoji {
+  font-size: 2.5rem;
+  margin-bottom: 1rem;
+}
+.project-card-title {
+  font-weight: 800;
+  font-size: 1.6rem;
+  margin-bottom: 0.6rem;
+  line-height: 1.2;
+}
+.project-card-desc {
+  font-weight: 300;
+  font-size: 1rem;
+  line-height: 1.6;
+  opacity: 0.85;
+}
+.project-card-tag {
+  display: inline-block;
+  margin-top: 1.2rem;
+  padding: 0.3rem 0.9rem;
+  border-radius: 100px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+}
+.project-card--1 .project-card-tag {
+  background: rgba(26,26,26,0.1);
+  color: #1a1a1a;
+}
+.project-card--2 .project-card-tag {
+  background: rgba(255,255,255,0.2);
+  color: #fff;
+}
+.project-card--3 .project-card-tag {
+  background: rgba(255,255,255,0.2);
+  color: #fff;
+}
+
+/* ============ DETAIL SECTIONS ============ */
+.detail-section {
+  padding: 8rem 2rem;
+  position: relative;
+}
+.detail-section:nth-child(odd) { background: #fffef8; }
+.detail-section:nth-child(even) { background: #fefcf6; }
+.detail-inner {
+  max-width: 1000px;
+  margin: 0 auto;
+}
+.detail-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4rem;
+  align-items: start;
+}
+@media (max-width: 768px) {
+  .detail-grid { grid-template-columns: 1fr; gap: 2.5rem; }
+}
+
+.detail-left {
+  position: sticky;
+  top: 100px;
+}
+.detail-title {
+  font-family: 'Noto Sans SC', sans-serif;
+  font-weight: 800;
+  font-size: clamp(1.8rem, 4vw, 2.8rem);
+  line-height: 1.2;
+  margin-bottom: 1rem;
+}
+.detail-title em {
+  font-style: normal;
+  color: #2B7FD8;
+}
+.detail-sub {
+  font-size: 1rem;
+  color: #666;
+  line-height: 1.7;
+}
+
+.detail-header {
+  text-align: center;
+  margin-bottom: 5rem;
+}
+.detail-value-title {
+  font-family: 'Noto Sans SC', sans-serif;
+  font-weight: 800;
+  font-size: clamp(2rem, 5vw, 3.5rem);
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+}
+
+.stagger-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+  max-width: 900px;
+  margin: 0 auto;
+}
+.stagger-col {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+.stagger-col--right {
+  margin-top: 120px;
+}
+
+.detail-right {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.detail-card {
+  background: #fff;
+  border-radius: 20px;
+  padding: 2rem;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.06);
+  transition: transform 0.3s, box-shadow 0.3s;
+}
+.detail-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 40px rgba(0,0,0,0.1);
+}
+.detail-card-num {
+  font-family: 'Inter', sans-serif;
+  font-weight: 900;
+  font-size: 2rem;
+  color: #F4D758;
+  margin-bottom: 0.5rem;
+}
+.detail-card h3 {
+  font-weight: 700;
+  font-size: 1.2rem;
+  margin-bottom: 0.6rem;
+}
+.detail-card p {
+  font-weight: 300;
+  font-size: 0.95rem;
+  color: #555;
+  line-height: 1.7;
+}
+
+/* ============ SKILLS / CERT ============ */
+.skills-section {
+  padding: 8rem 2rem;
+  background: linear-gradient(180deg, #fefcf0 0%, #fffef8 100%);
+}
+.skills-inner {
+  max-width: 800px;
+  margin: 0 auto;
+  text-align: center;
+}
+.skills-headline {
+  font-family: 'Noto Sans SC', sans-serif;
+  font-weight: 800;
+  font-size: clamp(2rem, 5vw, 3rem);
+  margin-bottom: 4rem;
+}
+.skills-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 2rem;
+}
+.skill-item {
+  background: #fff;
+  border-radius: 20px;
+  padding: 2.5rem 2rem;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.06);
+  transition: transform 0.3s;
+}
+.skill-item:hover {
+  transform: translateY(-6px);
+}
+.skill-icon {
+  font-size: 2.5rem;
+  margin-bottom: 1rem;
+}
+.skill-name {
+  font-weight: 700;
+  font-size: 1.1rem;
+  margin-bottom: 0.4rem;
+}
+.skill-desc {
+  font-weight: 300;
+  font-size: 0.9rem;
+  color: #666;
+  line-height: 1.6;
+}
+
+/* ============ SKILLS / CERT ============ */
+.fade-up {
+  opacity: 0;
+  transform: translateY(30px);
+  transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.fade-up.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+.fade-up-delay-1 { transition-delay: 0.1s; }
+.fade-up-delay-2 { transition-delay: 0.2s; }
+.fade-up-delay-3 { transition-delay: 0.3s; }
+
+/* ============ MODAL ============ */
+.modal-overlay {
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.85);
+  z-index: 10000;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+.modal-overlay.active {
+  opacity: 1;
+  pointer-events: auto;
+}
+.modal-content {
+  max-width: 92vw;
+  max-height: 90vh;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 30px 100px rgba(0,0,0,0.5);
+  transform: scale(0.9);
+  transition: transform 0.3s cubic-bezier(0.16,1,0.3,1);
+}
+.modal-overlay.active .modal-content {
+  transform: scale(1);
+}
+/* ── Modal: 全屏HTML嵌入模式 ── */
+.modal-overlay.html-mode {
+  background: #f4f3ef;
+  overflow: hidden;
+}
+.modal-overlay.html-mode .modal-content {
+  max-width: 100vw;
+  max-height: 100vh;
+  width: 100vw;
+  height: 100vh;
+  border-radius: 0;
+  overflow: hidden;
+}
+.modal-overlay.html-mode .modal-close {
+  position: fixed;
+  z-index: 10;
+  background: rgba(0,0,0,0.6);
+}
+.modal-overlay.html-mode .modal-close:hover {
+  background: rgba(0,0,0,0.85);
+}
+.modal-content img {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-height: 90vh;
+  object-fit: contain;
+  background: #fff;
+}
+.modal-close {
+  position: absolute;
+  top: 1.5rem; right: 1.8rem;
+  width: 40px; height: 40px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.15);
+  color: #fff;
+  font-size: 1.4rem;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s;
+  line-height: 1;
+}
+.modal-close:hover {
+  background: rgba(255,255,255,0.3);
+}
+
+.detail-card--clickable {
+  cursor: pointer;
+}
+.detail-card--clickable:hover {
+  transform: translateY(-6px) !important;
+  box-shadow: 0 16px 48px rgba(244,215,88,0.15) !important;
+}
+.detail-card-hint {
+  margin-top: 0.8rem !important;
+  font-size: 0.82rem !important;
+  color: #F4D758 !important;
+  font-weight: 500 !important;
+  opacity: 0.7;
+}
+@media (max-width: 768px) {
+  .project-grid { grid-template-columns: 1fr; gap: 2rem; }
+  .project-card { min-height: 320px; padding: 2rem; }
+  .timeline { padding-left: 2.5rem; }
+  .timeline::before { left: 4px; }
+  .tl-item { padding-right: 0; }
+  .tl-item::before { left: -2.5rem; width: 10px; height: 10px; }
+  .tl-num { display: none; }
+  .philosophy-text { font-size: clamp(1.5rem, 6vw, 2.5rem); }
+  .terminal-window { border-radius: 8px; }
+  .terminal-body { padding: 1.2rem 1rem 2rem; font-size: 0.8rem; min-height: 280px; }
+  .terminal-header-title { display: none; }
+  .skills-grid { grid-template-columns: 1fr; }
+  .stagger-grid { grid-template-columns: 1fr; }
+  .stagger-col--right { margin-top: 0; }
+  .detail-header { margin-bottom: 3rem; }
+}
+
+
+</style>
+</head>
+<body>
+
+<!-- Cursor glow -->
+<div class="cursor-glow" id="cursorGlow"></div>
+
+<!-- ==================== HERO — TERMINAL ==================== -->
+<section class="hero">
+  <div class="terminal-window">
+    <div class="terminal-header">
+      <div class="terminal-dot terminal-dot--red"></div>
+      <div class="terminal-dot terminal-dot--yellow"></div>
+      <div class="terminal-dot terminal-dot--green"></div>
+      <div class="terminal-header-title">dengbin@apm ~ %</div>
+    </div>
+    <div class="terminal-body" id="terminalBody">
+      <!-- Lines injected by JS typewriter -->
+    </div>
+  </div>
+  <div class="hero-scroll">
+    <span>Scroll</span>
+    <div class="hero-scroll-line"></div>
+  </div>
+</section>
+
+<!-- ==================== PHILOSOPHY ==================== -->
+<section class="philosophy-section">
+  <div class="philosophy-slide">
+    <div class="philosophy-number">01</div>
+    <p class="philosophy-text">选做对事<br>把事做对</p>
+    <span class="philosophy-deco">— what I believe</span>
+  </div>
+</section>
+
+<!-- ==================== TIMELINE ==================== -->
+<section class="timeline-section" id="aboutSection">
+  <div class="timeline-section-inner">
+    <p class="section-label fade-up">My Journey</p>
+    <h2 class="timeline-section-headline fade-up">我的打怪升级之路</h2>
+    <div class="timeline">
+      <div class="tl-item">
+        <div class="tl-year">2023 — 2024</div>
+        <div class="tl-title">网易游戏-Messiah引擎-DemoPM&社区运营</div>
+        <div class="tl-desc">主导多个Demo全流程管理，维护60+Demo信息资产，兼运营专题定制、文档重构、周边设计。</div>
+        <div class="tl-tags">
+          <span class="tl-tag">Demo管理</span>
+          <span class="tl-tag">信息维护</span>
+          <span class="tl-tag">流程搭建</span>
+        </div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-year">2023 — 2024</div>
+        <div class="tl-title">字节-UGC项目-自研编辑器PM</div>
+        <div class="tl-desc">从0到1搭建标准化工作流，规范需求单流转、技术文档模板，解决团队版本意识薄弱问题。</div>
+        <div class="tl-tags">
+          <span class="tl-tag">流程优化</span>
+          <span class="tl-tag">需求跟进</span>
+        </div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-year">2022 — 2023</div>
+        <div class="tl-title">两万里-游戏业务-游戏PM</div>
+        <div class="tl-desc">腾讯光子工作室固定合作伙伴，负责业务需求、内部制作管理与外部维系。</div>
+        <div class="tl-tags">
+          <span class="tl-tag">需求跟进</span>
+          <span class="tl-tag">客户维系</span>
+        </div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-year">2025 — 至今</div>
+        <div class="tl-title">元游-青云诀之伏魔-美术PM</div>
+        <div class="tl-desc">AI效能实践、美术管线制作管理、知识运营与团队建设。用数据验证AI提效，建立系统流程。</div>
+        <div class="tl-tags">
+          <span class="tl-tag">AI效能</span>
+          <span class="tl-tag">美术管线</span>
+          <span class="tl-tag">团队管理</span>
+          <span class="tl-tag">外包管理</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ==================== PROJECTS OVERVIEW ==================== -->
+<section class="projects">
+  <div class="projects-inner">
+    <p class="section-label fade-up">What I Do</p>
+    <h2 class="projects-headline fade-up">三个维度</h2>
+    <div class="project-grid">
+      <div class="project-card project-card--1 fade-up" data-tilt>
+        <div class="project-card-bg-text">AI</div>
+        <div class="project-card-content">
+          <div class="project-card-emoji">⚡</div>
+          <h3 class="project-card-title">AI 效能实践</h3>
+          <p class="project-card-desc">制定组内AI提效专项计划，推动AI使用融入日常制作管线，提供AI数据分析</p>
+        </div>
+      </div>
+      <div class="project-card project-card--2 fade-up fade-up-delay-1" data-tilt>
+        <div class="project-card-bg-text">ART</div>
+        <div class="project-card-content">
+          <div class="project-card-emoji">◈</div>
+          <h3 class="project-card-title">美术管线制作管理</h3>
+          <p class="project-card-desc">全链路统筹美术资产生产，建立可复用的美术生产管线，定期进行项目数据汇总</p>
+        </div>
+      </div>
+      <div class="project-card project-card--3 fade-up fade-up-delay-2" data-tilt>
+        <div class="project-card-bg-text">TEAM</div>
+        <div class="project-card-content">
+          <div class="project-card-emoji">✦</div>
+          <h3 class="project-card-title">知识运营与团队建设</h3>
+          <p class="project-card-desc">主导干货白皮书、季度智享会、月度复盘，推动制作意识内化，建设系统性内容积累与运营策略。</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ==================== DETAIL: 元游 ==================== -->
+<section class="detail-section">
+  <div class="detail-inner">
+    <div class="detail-header">
+      <h2 class="detail-value-title">我在团队中的价值</h2>
+    </div>
+    <div class="stagger-grid">
+      <div class="stagger-col">
+        <div class="detail-card">
+          <div class="detail-card-num">01</div>
+          <h3>梳理 · 管线全景</h3>
+          <p style="margin-top:0.6rem;"><strong>识别痛点</strong> — 与各环节核心相关方逐一沟通，定位管线中的真实堵点</p>
+          <p style="margin-top:0.6rem;"><strong>摸清产能</strong> — 梳理团队周期内的最大产出能力，明确各环节数据基线</p>
+          <p style="margin-top:0.6rem;"><strong>AI赋能路径</strong> — 盘点AI工具在制作链路中可嵌入的关键节点与提效空间</p>
+        </div>
+        <div class="detail-card">
+          <div class="detail-card-num">03</div>
+          <h3>跑通 · 数据验证</h3>
+          <p><strong>AI效能数据</strong> — AI使用率、提效比例、需求延期率变化趋势</p>
+          <p style="margin-top:0.6rem;"><strong>人效对比</strong> — 内部团队 vs 外包团队的人天产出对比</p>
+          <p style="margin-top:0.6rem;"><strong>持续跟踪</strong> — 建立周报/月报数据看板，让效果可量化、可追溯</p>
+        </div>
+      </div>
+      <div class="stagger-col stagger-col--right">
+        <div class="detail-card">
+          <div class="detail-card-num">02</div>
+          <h3>建制 · 系统优化</h3>
+          <p style="margin-top:0.6rem;"><strong>需求评审</strong> — 从无到有建立定期需求评审会，明确策划/研发沟通频率</p>
+          <p style="margin-top:0.6rem;"><strong>外包规范</strong> — 制定外包流程标准，统一交付与验收要求</p>
+          <p style="margin-top:0.6rem;"><strong>内审规则</strong> — 设定方案轮次上限与阶段同步机制，减少无效返工</p>
+        </div>
+        <div class="detail-card">
+          <div class="detail-card-num">04</div>
+          <h3>复用 · 知识沉淀</h3>
+          <p style="margin-top:0.6rem;"><strong>文档化</strong> — AI有效链路、内审标准、外包交付规范 → 整理为操作手册</p>
+          <p style="margin-top:0.6rem;"><strong>经验传播</strong> — 组织季度智享会，将AI提效探索的实践经验在组内分享</p>
+          <p style="margin-top:0.6rem;"><strong>能力升级</strong> — 推动制作意识内化，建设系统性内容积累体系</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ==================== DETAIL: Messiah ==================== -->
+<section class="detail-section">
+  <div class="detail-inner">
+    <div class="detail-grid">
+      <div class="detail-left">
+        <p class="section-label">What I Do</p>
+        <h2 class="detail-title">AI 效能实践</h2>
+        <p class="detail-sub"></p>
+      </div>
+      <div class="detail-right">
+        <div class="detail-card detail-card--clickable" onclick="openModal('图片1.png')">
+          <div class="detail-card-num">01</div>
+          <h3>AI 赋能计划</h3>
+          <p class="detail-card-hint">点击查看详情 ↗</p>
+        </div>
+        <div class="detail-card detail-card--clickable" onclick="openModal('图片2.png')">
+          <div class="detail-card-num">02</div>
+          <h3>小范围试点</h3>
+          <p class="detail-card-hint">点击查看详情 ↗</p>
+        </div>
+        <div class="detail-card detail-card--clickable" onclick="openModal('元游重点资料/stament.html')">
+          <div class="detail-card-num">03</div>
+          <h3>数据分析</h3>
+          <p class="detail-card-hint">点击查看详情 ↗</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ==================== SKILLS & CERT ==================== -->
+<section class="skills-section">
+  <div class="skills-inner">
+    <p class="section-label fade-up">Toolkit</p>
+    <h2 class="skills-headline fade-up">技能与认证</h2>
+    <div class="skills-grid" style="max-width:800px;margin:0 auto;">
+      <img src="图片3.png" alt="PMP Certificate" style="width:100%;height:auto;border-radius:12px;box-shadow:0 10px 40px rgba(0,0,0,0.3);display:block;" />
+    </div>
+  </div>
+</section>
+
+<!-- ==================== CONTACT ==================== -->
+<!-- ==================== HERO — TERMINAL (REPEAT) ==================== -->
+<section class="hero">
+  <div class="terminal-window">
+    <div class="terminal-header">
+      <div class="terminal-dot terminal-dot--red"></div>
+      <div class="terminal-dot terminal-dot--yellow"></div>
+      <div class="terminal-dot terminal-dot--green"></div>
+      <div class="terminal-header-title">dengbin@apm ~ %</div>
+    </div>
+    <div class="terminal-body" id="terminalBody2">
+      <!-- Lines injected by JS typewriter -->
+    </div>
+  </div>
+</section>
+
+<script>
+/* ============ TERMINAL TYPEWRITER + LAUNCH BAR ============ */
+(function() {
+  const body = document.getElementById('terminalBody');
+  
+  const lines = [
+    { type: 'cmd',    text: '$ whoami' },
+    { type: 'output', html: '<span class="output">邓斌</span>' },
+    { type: 'blank' },
+    { type: 'cmd',    text: '$ cat about.md' },
+    { type: 'output', html: '<span class="output">游戏项目管理 PMP认证</span>' },
+    { type: 'output', html: '<span class="output">正确的时间正确的人把正确的事做好</span>' },
+    { type: 'output', html: '<span class="output">网易-字节-两万里-元游</span>' },
+    { type: 'blank' },
+    { type: 'cmd',    text: '$ echo "stay hungry，stay foolish"' },
+    { type: 'output', html: '<span class="highlight">✨</span>' },
+  ];
+
+  const lineEls = [];
+  lines.forEach(line => {
+    const div = document.createElement('div');
+    div.className = 'terminal-line';
+    if (line.type === 'blank') {
+      div.innerHTML = '&nbsp;';
+    }
+    lineEls.push({ el: div, data: line });
+    body.appendChild(div);
+  });
+
+  const cursorLine = document.createElement('div');
+  cursorLine.className = 'terminal-line visible';
+  cursorLine.innerHTML = '<span class="terminal-cursor"></span>';
+  cursorLine.style.opacity = '0';
+  body.appendChild(cursorLine);
+
+  let lineIdx = 0;
+
+  function typeNextLine() {
+    if (lineIdx >= lineEls.length) {
+      cursorLine.style.opacity = '1';
+      return;
+    }
+
+    const { el, data } = lineEls[lineIdx];
+    el.classList.add('visible');
+    lineIdx++;
+
+    if (data.type === 'blank') {
+      setTimeout(typeNextLine, 150);
+      return;
+    }
+
+    if (data.type === 'cmd') {
+      typeText(el, data.text, 'cmd', 45, () => {
+        setTimeout(typeNextLine, 300);
+      });
+    } else {
+      const prefix = '<span class="cmd">&gt; </span>';
+      el.innerHTML = prefix;
+      setTimeout(() => {
+        el.innerHTML = prefix + data.html;
+        setTimeout(typeNextLine, 200);
+      }, 120);
+    }
+  }
+
+  function typeText(el, text, className, speed, callback) {
+    const parts = text.match(/^(\$ )(.*)/);
+    let charIdx = 0;
+
+    if (parts) {
+      el.innerHTML = '<span class="cmd">$ </span>';
+      const restText = parts[2];
+      charIdx = 0;
+
+      function typeChar() {
+        if (charIdx < restText.length) {
+          el.innerHTML = '<span class="cmd">$ </span><span class="cmd-text">' + restText.substring(0, charIdx + 1) + '</span>';
+          charIdx++;
+          setTimeout(typeChar, speed + Math.random() * 30);
+        } else {
+          if (callback) callback();
+        }
+      }
+      typeChar();
+    } else {
+      el.textContent = '';
+      function typeChar() {
+        if (charIdx < text.length) {
+          el.textContent += text[charIdx];
+          charIdx++;
+          setTimeout(typeChar, speed);
+        } else {
+          if (callback) callback();
+        }
+      }
+      typeChar();
+    }
+  }
+
+  setTimeout(typeNextLine, 600);
+})();
+
+/* ============ SECOND TERMINAL TYPEWRITER (SCROLL TRIGGERED) ============ */
+(function() {
+  const body2 = document.getElementById('terminalBody2');
+  if (!body2) return;
+
+  const lines = [
+    { type: 'cmd',    text: '$ whoami' },
+    { type: 'output', html: '<span class="output">邓斌</span>' },
+    { type: 'blank' },
+    { type: 'cmd',    text: '$ cat about.md' },
+    { type: 'output', html: '<span class="output">游戏项目管理 PMP认证</span>' },
+    { type: 'output', html: '<span class="output">正确的时间正确的人把正确的事做好</span>' },
+    { type: 'output', html: '<span class="output">网易-字节-两万里-元游</span>' },
+    { type: 'blank' },
+    { type: 'cmd',    text: '$ echo "stay hungry，stay foolish"' },
+    { type: 'output', html: '<span class="highlight">✨</span>' },
+  ];
+
+  const lineEls = [];
+  lines.forEach(line => {
+    const div = document.createElement('div');
+    div.className = 'terminal-line';
+    if (line.type === 'blank') div.innerHTML = '&nbsp;';
+    lineEls.push({ el: div, data: line });
+    body2.appendChild(div);
+  });
+
+  const cursorLine = document.createElement('div');
+  cursorLine.className = 'terminal-line visible';
+  cursorLine.innerHTML = '<span class="terminal-cursor"></span>';
+  cursorLine.style.opacity = '0';
+  body2.appendChild(cursorLine);
+
+  let lineIdx = 0;
+  let started = false;
+
+  function typeNextLine() {
+    if (lineIdx >= lineEls.length) { cursorLine.style.opacity = '1'; return; }
+    const { el, data } = lineEls[lineIdx];
+    el.classList.add('visible');
+    lineIdx++;
+    if (data.type === 'blank') { setTimeout(typeNextLine, 150); return; }
+    if (data.type === 'cmd') {
+      typeText(el, data.text, 'cmd', 45, () => { setTimeout(typeNextLine, 300); });
+    } else {
+      el.innerHTML = '<span class="cmd">&gt; </span>';
+      setTimeout(() => { el.innerHTML = '<span class="cmd">&gt; </span>' + data.html; setTimeout(typeNextLine, 200); }, 120);
+    }
+  }
+
+  function typeText(el, text, className, speed, callback) {
+    const parts = text.match(/^(\$ )(.*)/);
+    if (parts) {
+      el.innerHTML = '<span class="cmd">$ </span>';
+      const rest = parts[2]; let ci = 0;
+      function tc() {
+        if (ci < rest.length) { el.innerHTML = '<span class="cmd">$ </span><span class="cmd-text">' + rest.substring(0, ci + 1) + '</span>'; ci++; setTimeout(tc, speed + Math.random() * 30); } else if (callback) callback();
+      }
+      tc();
+    } else {
+      el.textContent = ''; let ci = 0;
+      function tc() { if (ci < text.length) { el.textContent += text[ci]; ci++; setTimeout(tc, speed); } else if (callback) callback(); }
+      tc();
+    }
+  }
+
+  // Trigger on scroll into view
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting && !started) { started = true; setTimeout(typeNextLine, 400); }
+    });
+  }, { threshold: 0.3 });
+  observer.observe(body2);
+})();
+
+/* ============ INTERSECTION OBSERVER ============ */
+(function() {
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('is-visible');
+      }
+    });
+  }, { threshold: 0.15, rootMargin: '0px 0px -50px 0px' });
+
+  document.querySelectorAll('.fade-up, .tl-item, .philosophy-text').forEach(el => {
+    observer.observe(el);
+  });
+})();
+
+/* ============ MOUSE FOLLOW CURSOR GLOW ============ */
+(function() {
+  const glow = document.getElementById('cursorGlow');
+  let mx = 0, my = 0, gx = 0, gy = 0;
+
+  document.addEventListener('mousemove', (e) => {
+    mx = e.clientX;
+    my = e.clientY;
+  });
+
+  function animate() {
+    gx += (mx - gx) * 0.08;
+    gy += (my - gy) * 0.08;
+    glow.style.left = gx + 'px';
+    glow.style.top = gy + 'px';
+    requestAnimationFrame(animate);
+  }
+  animate();
+})();
+
+/* ============ CARD TILT (MOUSE FOLLOW) ============ */
+(function() {
+  document.querySelectorAll('[data-tilt]').forEach(card => {
+    card.addEventListener('mousemove', (e) => {
+      const rect = card.getBoundingClientRect();
+      const x = (e.clientX - rect.left) / rect.width - 0.5;
+      const y = (e.clientY - rect.top) / rect.height - 0.5;
+      card.style.transform = `perspective(800px) rotateY(${x * 8}deg) rotateX(${-y * 8}deg) translateY(-4px)`;
+    });
+    card.addEventListener('mouseleave', () => {
+      card.style.transform = 'perspective(800px) rotateY(0) rotateX(0) translateY(0)';
+    });
+  });
+})();
+
+/* ============ PARALLAX ON SCROLL ============ */
+(function() {
+  const terminalWin = document.querySelector('.terminal-window');
+  if (!terminalWin) return;
+
+  window.addEventListener('scroll', () => {
+    const st = window.pageYOffset;
+    if (st < window.innerHeight) {
+      const ratio = st / window.innerHeight;
+      terminalWin.style.transform = `translateY(${st * 0.15}px)`;
+      terminalWin.style.opacity = 1 - ratio * 0.6;
+    }
+  }, { passive: true });
+})();
+/* ============ MODAL TRIGGER ============ */
+(function() {
+  var overlay = document.getElementById('modalOverlay');
+  var closeBtn = document.getElementById('modalClose');
+
+  if (!overlay) { console.error('modalOverlay not found'); return; }
+
+  document.querySelectorAll('[data-modal]').forEach(function(card) {
+    card.style.cursor = 'pointer';
+    card.addEventListener('click', function(e) {
+      e.preventDefault();
+      overlay.style.display = 'flex';
+      setTimeout(function() { overlay.classList.add('active'); }, 10);
+      document.body.style.overflow = 'hidden';
+    });
+  });
+
+  function closeModal() {
+    overlay.classList.remove('active');
+    setTimeout(function() {
+      overlay.style.display = 'none';
+    }, 300);
+    document.body.style.overflow = '';
+  }
+
+  closeBtn.addEventListener('click', closeModal);
+  overlay.addEventListener('click', function(e) {
+    if (e.target === overlay) closeModal();
+  });
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') closeModal();
+  });
+})();
+/* ============ OPEN MODAL FUNCTION ============ */
+function openModal(src) {
+  var m = document.getElementById('modalOverlay');
+  var img = document.getElementById('modalImg');
+  var iframe = document.getElementById('modalIframe');
+
+  // 判断是图片还是HTML
+  if (src.match(/\.(png|jpg|jpeg|gif|webp|svg)$/i)) {
+    // 图片模式
+    m.classList.remove('html-mode');
+    if (iframe) iframe.style.display = 'none';
+    if (img) { img.style.display = ''; img.src = src; }
+  } else if (src.match(/\.html?$/i)) {
+    // HTML模式：全屏嵌入
+    m.classList.add('html-mode');
+    if (img) img.style.display = 'none';
+    if (iframe) { iframe.style.display = ''; iframe.src = src; }
+  }
+  m.style.display = 'flex';
+  setTimeout(function() { m.classList.add('active'); }, 10);
+  document.body.style.overflow = 'hidden';
+}
+</script>
+<!-- ==================== MODAL ==================== -->
+<div class="modal-overlay" id="modalOverlay" onclick="if(event.target===this){var m=this;m.classList.remove('active');setTimeout(function(){m.style.display='none'},300);document.body.style.overflow=''}">
+  <button class="modal-close" id="modalClose" onclick="var m=document.getElementById('modalOverlay');m.classList.remove('active');setTimeout(function(){m.style.display='none'},300);document.body.style.overflow=''">✕</button>
+  <div class="modal-content">
+    <img src="" alt="" id="modalImg" style="display:none;">
+    <iframe id="modalIframe" style="display:none;width:100%;height:100%;border:none;" sandbox="allow-same-origin allow-scripts allow-forms"></iframe>
+  </div>
+</div>
+
+</body>
+</html>
